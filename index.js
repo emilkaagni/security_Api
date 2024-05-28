@@ -3,6 +3,7 @@ const express = require('express');
 const connectDatabase = require('./database/database');
 const dotenv = require('dotenv')
 const cors = require('cors')
+
 const acceptFormData = require('express-fileupload')
 
 // Creating an express app
