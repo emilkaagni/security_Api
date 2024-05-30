@@ -2,45 +2,45 @@ const userModel = require('../models/userModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
-const createUser = async (req,res) => {
+const createUser = async (req, res) => {
     // 1. Check incomming data
     console.log(req.body);
 
     // 2. Destructure the incomming data
-    const {name, email, password} = req.body;
+    const { name, email, password } = req.body;
 
     // 3. Validate the data (if empty, stop the process and send res)
-    if(!name || !email || !password){
+    if (!name || !email || !password) {
         // res.send("Please enter all fields!")
         return res.json({
-            "success" : false,
-            "message" : "Please enter all fields!"
+            "success": false,
+            "message": "Please enter all fields!"
         })
     }
 
     // 4. Error Handling (Try Catch)
     try {
         // 5. Check if the user is already registered
-        const existingUser = await userModel.findOne({email : email })
+        const existingUser = await userModel.findOne({ email: email })
 
         // 5.1 if user found: Send response 
-        if(existingUser){
+        if (existingUser) {
             return res.json({
-                "success" : false,
-                "message" : "User Already Exists!"
+                "success": false,
+                "message": "User Already Exists!"
             })
         }
 
         // Hashing/Encryption of the password
         const randomSalt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password,randomSalt)
+        const hashedPassword = await bcrypt.hash(password, randomSalt)
 
         // 5.2 if user is new:
         const newUser = new userModel({
             // Database Fields : Client's Value
-            name : name,
-            email : email,
-            password : hashedPassword
+            name: name,
+            email: email,
+            password: hashedPassword
         })
 
         // Save to database
@@ -48,37 +48,37 @@ const createUser = async (req,res) => {
 
         // send the response
         res.json({
-            "success" : true,
-            "message" : "User Created Successfully!"
+            "success": true,
+            "message": "User Created Successfully!"
         })
 
-        
+
     } catch (error) {
         console.log(error)
         res.json({
             "success": false,
-            "message" : "Internal Server Error!" 
+            "message": "Internal Server Error!"
         })
     }
- 
 
-    
+
+
 }
 
 // Login function
-const loginUser =  async (req,res) => {
+const loginUser = async (req, res) => {
 
     // Check incomming data
     console.log(req.body)
 
     // Destructuring
-    const {email, password}  = req.body;
+    const { email, password } = req.body;
 
     // Validation
-    if(!email || !password){
+    if (!email || !password) {
         return res.json({
-            "success" : false,
-            "message" : "Please enter all fields!"
+            "success": false,
+            "message": "Please enter all fields!"
         })
     }
 
@@ -87,50 +87,50 @@ const loginUser =  async (req,res) => {
     try {
 
         // find user (email)
-        const user = await userModel.findOne({email : email})
+        const user = await userModel.findOne({ email: email })
         // found data : firstName, lastname, email, password
 
         // not found (error message)
-        if(!user){
+        if (!user) {
             return res.json({
-                "success" : false,
-                "message" : "User not exists!"
+                "success": false,
+                "message": "User does not exists!"
             })
         }
 
         // Compare password (bcrypt)
-        const isValidPassword = await bcrypt.compare(password,user.password)
+        const isValidPassword = await bcrypt.compare(password, user.password)
 
         // not valid (error)
-        if(!isValidPassword){
+        if (!isValidPassword) {
             return res.json({
-                "success" : false,
-                "message" : "Password not matched!"
+                "success": false,
+                "message": "Password is incorrect!"
             })
         }
 
         // token (Generate - user Data + KEY)
         const token = await jwt.sign(
-            {id : user._id},
+            { id: user._id },
             process.env.JWT_SECRET
         )
 
         // response (token, user data)
         res.json({
-            "success" : true,
-            "message" : "User Logginned Successul!",
-            "token" : token,
-            "userData" : user
+            "success": true,
+            "message": "User Logginned Successul!",
+            "token": token,
+            "userData": user
         })
-        
+
     } catch (error) {
         console.log(error)
         return res.json({
-            "success" : false,
-            "message" : "Internal Server Error!"
+            "success": false,
+            "message": "Internal Server Error!"
         })
     }
-    
+
 }
 
 

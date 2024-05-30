@@ -18,6 +18,11 @@ router.post('/create', userController.createUser)
 // login routes
 router.post('/login', userController.loginUser)
 
+// homepage route
+router.get('/', (req, res) => {
+    res.send("Homepage")
+})
+
 // controller (Export) - Routes (inport) - use - (index.js)
 
 // exporting the router
