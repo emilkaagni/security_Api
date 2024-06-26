@@ -43,7 +43,7 @@ app.get('/test', (req, res) => {
 
 
 // configuring Routes of User
-app.use('/api/user', require('./routes/userRoutes'))
+app.use('/api/user', require('./routes/userRoutes'));
 
 // for product
 // app.use('/api/product', require('./routes/productRoutes'))

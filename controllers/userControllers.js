@@ -7,10 +7,10 @@ const createUser = async (req, res) => {
     console.log(req.body);
 
     // 2. Destructure the incomming data
-    const { name, email, password } = req.body;
+    const { fname, lname, email, phone, username, password } = req.body;
 
     // 3. Validate the data (if empty, stop the process and send res)
-    if (!name || !email || !password) {
+    if (!fname || !lname || !email ||!phone || !username || !password) {
         // res.send("Please enter all fields!")
         return res.json({
             "success": false,
@@ -38,8 +38,12 @@ const createUser = async (req, res) => {
         // 5.2 if user is new:
         const newUser = new userModel({
             // Database Fields : Client's Value
-            name: name,
+            fname: fname,
+            lname: lname,
+
             email: email,
+            phone: phone,
+            username: username,
             password: hashedPassword
         })
 
