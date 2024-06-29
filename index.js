@@ -30,6 +30,9 @@ dotenv.config()
 // Connecting to database
 connectDatabase()
 
+// static
+app.use(express.static('public'))
+
 // Defining the port
 const PORT = process.env.PORT;
 
@@ -43,9 +46,10 @@ app.get('/test', (req, res) => {
 
 
 // configuring Routes of User
-app.use('/api/user', require('./routes/userRoutes'));
+app.use('/api/user', require('./routes/userRoutes'))
 
 // for product
+app.use('/api/product', require('./routes/productRoutes'))
 // app.use('/api/product', require('./routes/productRoutes'))
 
 // http://localhost:5500/api/user/create
