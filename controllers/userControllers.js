@@ -137,9 +137,124 @@ const loginUser = async (req, res) => {
 
 }
 
+// Forgot password by using phone number
+const forgotPassword = async (req,res) => {
+    const {phone} = req.body;
+
+    if(!phone){
+        return res.status(400).json({
+            'success' : false,
+            'message' : 'Provide your phone number!'
+        })
+    }
+
+    try {
+
+        // finding user
+        const user = await userModel.findOne({phone : phone})
+        if(!user){
+            return res.status(400).json({
+                'success' : false,
+                'message' : 'User Not Found!'
+            })
+        }
+
+        // generate random 6 digit otp
+        const otp = Math.floor(100000 + Math.random() * 900000)
+
+        // generate expiry date
+        const expiryDate = Date.now() + 360000;
+
+        // save to database for verification
+        user.resetPasswordOTP = otp;
+        user.resetPasswordExpires = expiryDate;
+        await user.save();
+
+        // send to registered phone number
+        const isSent = await sendOtp(phone, otp)
+        if(!isSent){
+            return res.status(400).json({
+                'success' : false,
+                'message' : 'Error Sending OTP Code!'
+            })
+        }
+
+        // if success
+        res.status(200).json({
+            'success' : true,
+            'message' : 'OTP Send Successfully!'
+        })
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            'success' : false,
+            'message' : 'Server Error!'
+        })
+    }
+}
+
+// Verify otp and set new password
+const verifyOtpAndSetPassword = async (req,res) => {
+
+    // get data
+    const {phone, otp, newPassword} = req.body;
+    if(!phone || !otp || !newPassword){
+        return res.status(400).json({
+            'success': false,
+            'message' : 'Required fields are missing!'
+        })
+    }
+
+    try {
+        const user = await userModel.findOne({phone : phone})
+
+        // Verify otp
+        if(user.resetPasswordOTP != otp){
+            return res.status(400).json({
+                'success': false,
+                'message' : 'Invalid OTP!'
+            }) 
+        }
+
+        if(user.resetPasswordExpires < Date.now()){
+            return res.status(400).json({
+                'success': false,
+                'message' : 'OTP Expired!'
+            }) 
+        }
+
+        // password hash
+        // Hashing/Encryption of the password
+        const randomSalt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(newPassword,randomSalt)
+
+        // update to databse
+        user.password = hashedPassword;
+        await user.save()
+
+        // response
+        res.status(200).json({
+            'success' : true,
+            'message' : 'OTP Verified and Password Updated!'
+        })
+
+        
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json({
+            'success': false,
+            'message' : 'Server Error!'
+        }) 
+    }
+
+}
+
 
 // exporting
 module.exports = {
     createUser,
-    loginUser
+    loginUser,
+    forgotPassword,
+    verifyOtpAndSetPassword
 }
