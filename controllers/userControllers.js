@@ -1,6 +1,7 @@
 const userModel = require('../models/userModel')
 const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const sendOtp = require('../service/sendOtp');
 
 const createUser = async (req, res) => {
     // 1. Check incomming data
@@ -10,7 +11,7 @@ const createUser = async (req, res) => {
     const { fname, lname, email, phone, username, password } = req.body;
 
     // 3. Validate the data (if empty, stop the process and send res)
-    if (!fname || !lname || !email ||!phone || !username || !password) {
+    if (!fname || !lname || !email || !phone || !username || !password) {
         // res.send("Please enter all fields!")
         return res.json({
             "success": false,
@@ -138,24 +139,24 @@ const loginUser = async (req, res) => {
 }
 
 // Forgot password by using phone number
-const forgotPassword = async (req,res) => {
-    const {phone} = req.body;
+const forgotPassword = async (req, res) => {
+    const { phone } = req.body;
 
-    if(!phone){
+    if (!phone) {
         return res.status(400).json({
-            'success' : false,
-            'message' : 'Provide your phone number!'
+            'success': false,
+            'message': 'Provide your phone number!'
         })
     }
 
     try {
 
         // finding user
-        const user = await userModel.findOne({phone : phone})
-        if(!user){
+        const user = await userModel.findOne({ phone: phone })
+        if (!user) {
             return res.status(400).json({
-                'success' : false,
-                'message' : 'User Not Found!'
+                'success': false,
+                'message': 'User Not Found!'
             })
         }
 
@@ -172,62 +173,62 @@ const forgotPassword = async (req,res) => {
 
         // send to registered phone number
         const isSent = await sendOtp(phone, otp)
-        if(!isSent){
+        if (!isSent) {
             return res.status(400).json({
-                'success' : false,
-                'message' : 'Error Sending OTP Code!'
+                'success': false,
+                'message': 'Error Sending OTP Code!'
             })
         }
 
         // if success
         res.status(200).json({
-            'success' : true,
-            'message' : 'OTP Send Successfully!'
+            'success': true,
+            'message': 'OTP Send Successfully!'
         })
-        
+
     } catch (error) {
         console.log(error)
         res.status(500).json({
-            'success' : false,
-            'message' : 'Server Error!'
+            'success': false,
+            'message': 'Server Error!'
         })
     }
 }
 
 // Verify otp and set new password
-const verifyOtpAndSetPassword = async (req,res) => {
+const verifyOtpAndSetPassword = async (req, res) => {
 
     // get data
-    const {phone, otp, newPassword} = req.body;
-    if(!phone || !otp || !newPassword){
+    const { phone, otp, newPassword } = req.body;
+    if (!phone || !otp || !newPassword) {
         return res.status(400).json({
             'success': false,
-            'message' : 'Required fields are missing!'
+            'message': 'Required fields are missing!'
         })
     }
 
     try {
-        const user = await userModel.findOne({phone : phone})
+        const user = await userModel.findOne({ phone: phone })
 
         // Verify otp
-        if(user.resetPasswordOTP != otp){
+        if (user.resetPasswordOTP != otp) {
             return res.status(400).json({
                 'success': false,
-                'message' : 'Invalid OTP!'
-            }) 
+                'message': 'Invalid OTP!'
+            })
         }
 
-        if(user.resetPasswordExpires < Date.now()){
+        if (user.resetPasswordExpires < Date.now()) {
             return res.status(400).json({
                 'success': false,
-                'message' : 'OTP Expired!'
-            }) 
+                'message': 'OTP Expired!'
+            })
         }
 
         // password hash
         // Hashing/Encryption of the password
         const randomSalt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(newPassword,randomSalt)
+        const hashedPassword = await bcrypt.hash(newPassword, randomSalt)
 
         // update to databse
         user.password = hashedPassword;
@@ -235,17 +236,17 @@ const verifyOtpAndSetPassword = async (req,res) => {
 
         // response
         res.status(200).json({
-            'success' : true,
-            'message' : 'OTP Verified and Password Updated!'
+            'success': true,
+            'message': 'OTP Verified and Password Updated!'
         })
 
-        
+
     } catch (error) {
         console.log(error)
         return res.status(500).json({
             'success': false,
-            'message' : 'Server Error!'
-        }) 
+            'message': 'Server Error!'
+        })
     }
 
 }
