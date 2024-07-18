@@ -52,6 +52,8 @@ app.use('/api/user', require('./routes/userRoutes'))
 app.use('/api/product', require('./routes/productRoutes'))
 // app.use('/api/product', require('./routes/productRoutes'))
 
+// app.use('/api/ads', adRoutes)
+
 // http://localhost:5500/api/user/create
 
 

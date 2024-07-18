@@ -209,6 +209,7 @@ const verifyOtpAndSetPassword = async (req, res) => {
 
     try {
         const user = await userModel.findOne({ phone: phone })
+        console.log(user.resetPasswordOTP)
 
         // Verify otp
         if (user.resetPasswordOTP != otp) {
