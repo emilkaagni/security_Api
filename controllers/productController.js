@@ -258,32 +258,27 @@
 // // START YOUR PROJECT! (in Quite Mode)
 
 
-
-
-const path = require('path')
+const path = require('path');
 const productModel = require('../models/productModel');
 const fs = require('fs'); // File system for handling file uploads
 
 // Create a new product with image upload
 const createProduct = async (req, res) => {
-    console.log(req.body); // Log request body
-    console.log(req.files); // Log request files
-    console.log('User ID in createProduct:', req.user); // Log user ID
-    console.log('req.user:', req.user); // Log req.user
-
+    console.log(req.body);
+    console.log(req.files);
     const { productName, productPrice, productCategory, productDescription } = req.body;
 
     if (!productName || !productPrice || !productCategory || !productDescription) {
         return res.status(400).json({
-            success: false,
-            message: "Enter all fields!"
+            "success": false,
+            "message": "Enter all fields!"
         });
     }
 
     if (!req.files || !req.files.productImage) {
         return res.status(400).json({
-            success: false,
-            message: "Image not found!!"
+            "success": false,
+            "message": "Image not found!!"
         });
     }
 
@@ -299,31 +294,30 @@ const createProduct = async (req, res) => {
             productCategory,
             productDescription,
             productImage: imageName,
-            createdBy: req.user.id // Added the user ID to the product
+            createdBy: req.user.id // Fixed to use req.user.id
         });
         const product = await newProduct.save();
         res.status(201).json({
-            success: true,
-            message: "Product Created Successfully!",
-            data: product
+            "success": true,
+            "message": "Product Created Successfully!",
+            "data": product
         });
     } catch (error) {
         console.log(error);
         res.status(500).json({
-            success: false,
-            message: "Internal Server Error!",
-            error: error.message,
-            stack: error.stack
+            "success": false,
+            "message": "Internal Server Error!",
+            "error": error.message,
+            "stack": error.stack
+
         });
     }
 };
 
-// Retrieve all products for Specific User
-const getAllProducts = async (req, res) => {
-    console.log('User ID in getAllProducts:', req.user.id); // Log user ID
-
+// Retrieve all products for authenticated users
+const getAllProductsAuth = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user.id; // Fixed to use req.user.id
         const allProducts = await productModel.find({ createdBy: userId });
         res.status(201).json({
             "success": true,
@@ -340,26 +334,24 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-
-// // Retrieve all products
-// const getAllProducts = async (req, res) => {
-//     try {
-//         const userId = req.user._id;
-//         const allProducts = await productModel.find({ createdBy: req.user._id });
-//         res.status(201).json({
-//             "success": true,
-//             "message": "Products Fetched successfully!",
-//             "products": allProducts
-//         });
-//     } catch (error) {
-//         console.log(error);
-//         res.status(500).json({
-//             "success": false,
-//             "message": "Internal server error",
-//             "error": error
-//         });
-//     }
-// };
+// Retrieve all products for unauthenticated users
+const getAllProducts = async (req, res) => {
+    try {
+        const allProducts = await productModel.find({});
+        res.status(201).json({
+            "success": true,
+            "message": "Products Fetched successfully!",
+            "products": allProducts
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            "success": false,
+            "message": "Internal server error",
+            "error": error
+        });
+    }
+};
 
 // Retrieve a single product by ID
 const getSingleProduct = async (req, res) => {
@@ -470,9 +462,12 @@ const paginationProducts = async (req, res) => {
 
 module.exports = {
     createProduct,
+    getAllProductsAuth,
     getAllProducts,
     getSingleProduct,
     deleteProduct,
     updateProduct,
     paginationProducts
 };
+
+
