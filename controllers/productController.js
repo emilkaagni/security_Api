@@ -268,6 +268,7 @@ const fs = require('fs'); // File system for handling file uploads
 const createProduct = async (req, res) => {
     console.log(req.body); // Log request body
     console.log(req.files); // Log request files
+    console.log('User ID in createProduct:', req.user); // Log user ID
     console.log('req.user:', req.user); // Log req.user
 
     const { productName, productPrice, productCategory, productDescription } = req.body;
@@ -317,11 +318,13 @@ const createProduct = async (req, res) => {
     }
 };
 
-// Retrieve all products
+// Retrieve all products for Specific User
 const getAllProducts = async (req, res) => {
+    console.log('User ID in getAllProducts:', req.user.id); // Log user ID
+
     try {
-        const userId = req.user._id;
-        const allProducts = await productModel.find({ createdBy: req.user._id });
+        const userId = req.user.id;
+        const allProducts = await productModel.find({ createdBy: userId });
         res.status(201).json({
             "success": true,
             "message": "Products Fetched successfully!",
@@ -336,6 +339,27 @@ const getAllProducts = async (req, res) => {
         });
     }
 };
+
+
+// // Retrieve all products
+// const getAllProducts = async (req, res) => {
+//     try {
+//         const userId = req.user._id;
+//         const allProducts = await productModel.find({ createdBy: req.user._id });
+//         res.status(201).json({
+//             "success": true,
+//             "message": "Products Fetched successfully!",
+//             "products": allProducts
+//         });
+//     } catch (error) {
+//         console.log(error);
+//         res.status(500).json({
+//             "success": false,
+//             "message": "Internal server error",
+//             "error": error
+//         });
+//     }
+// };
 
 // Retrieve a single product by ID
 const getSingleProduct = async (req, res) => {

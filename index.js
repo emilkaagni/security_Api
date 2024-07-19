@@ -3,8 +3,8 @@ const express = require('express');
 const connectDatabase = require('./database/database');
 const dotenv = require('dotenv')
 const cors = require('cors')
-
 const acceptFormData = require('express-fileupload')
+const chatServer = require('./server/chatServer');
 
 // Creating an express app
 const app = express();
@@ -54,12 +54,18 @@ app.use('/api/product', require('./routes/productRoutes'))
 
 // app.use('/api/ads', adRoutes)
 
+app.use('/api/chat', require('./routes/chatRoutes'));
+
 // http://localhost:5500/api/user/create
 
 
 
 
 // Starting the server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server is Running on port ${PORT}!`)
 })
+
+
+// Integrating chat server with the existing HTTP server
+chatServer(server);
