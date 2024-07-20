@@ -1,34 +1,31 @@
 const socketIo = require('socket.io');
-const mongoose = require('mongoose');
-const Chat = require('../models/chatModel');
-const dotenv = require('dotenv');
 
-dotenv.config();
-
-const chatServer = (server) => {
+const initializeSocketServer = (server) => {
     const io = socketIo(server, {
         cors: {
-            origin: "http://localhost:3000", // Ensure this matches your frontend URL
-            methods: ["GET", "POST"]
+            origin: '*',
+            methods: ['GET', 'POST']
         }
     });
 
     io.on('connection', (socket) => {
-        console.log('a user connected');
+        console.log('New client connected', socket.id);
 
-        socket.on('chat message', async (msg) => {
-            console.log('message: ' + msg);
+        socket.on('join_chat', (chatId) => {
+            socket.join(chatId);
+            console.log(`User joined chat: ${chatId}`);
+        });
 
-            const chatMessage = new Chat({ message: msg });
-            await chatMessage.save();
-
-            io.emit('chat message', msg);
+        socket.on('send_message', (message) => {
+            io.to(message.chatId).emit('receive_message', message);
         });
 
         socket.on('disconnect', () => {
-            console.log('user disconnected');
+            console.log('Client disconnected', socket.id);
         });
     });
+
+    return io;
 };
 
-module.exports = chatServer;
+module.exports = initializeSocketServer;
