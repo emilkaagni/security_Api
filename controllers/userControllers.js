@@ -2,6 +2,7 @@ const userModel = require('../models/userModel')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 const sendOtp = require('../service/sendOtp');
+const User = require('../models/userModel');
 
 const createUser = async (req, res) => {
     // 1. Check incomming data
@@ -252,11 +253,82 @@ const verifyOtpAndSetPassword = async (req, res) => {
 
 }
 
+// // Get user profile
+// const getUserProfile = async (req, res) => {
+//     try {
+//         const user = await User.findById(req.params.userId).select('-password');
+//         if (!user) {
+//             return res.status(404).json({ success: false, message: 'User not found' });
+//         }
+//         res.json({ success: true, user });
+//     } catch (error) {
+//         res.status(500).json({ success: false, message: 'Server error', error });
+//     }
+// };
+
+// // Update user profile
+// const updateUserProfile = async (req, res) => {
+//     try {
+//         const user = await User.findById(req.params.userId);
+//         if (!user) {
+//             return res.status(404).json({ success: false, message: 'User not found' });
+//         }
+
+//         const { fname, lname, email, phone, username, profilePicture } = req.body;
+//         user.fname = fname || user.fname;
+//         user.lname = lname || user.lname;
+//         user.email = email || user.email;
+//         user.phone = phone || user.phone;
+//         user.username = username || user.username;
+//         user.profilePicture = profilePicture || user.profilePicture;
+
+//         await user.save();
+//         res.json({ success: true, user });
+//     } catch (error) {
+//         res.status(500).json({ success: false, message: 'Server error', error });
+//     }
+// };
+const getUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId).select('-password');
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        res.json({ success: true, user });
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
+
+const updateUserProfile = async (req, res) => {
+    const { fname, lname, email, phone, username } = req.body;
+    try {
+        let user = await User.findById(req.params.userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        user.fname = fname || user.fname;
+        user.lname = lname || user.lname;
+        user.email = email || user.email;
+        user.phone = phone || user.phone;
+        user.username = username || user.username;
+
+        await user.save();
+        res.json({ success: true, user });
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+        res.status(500).json({ success: false, message: 'Server error', error: error.message });
+    }
+};
 
 // exporting
 module.exports = {
     createUser,
     loginUser,
     forgotPassword,
-    verifyOtpAndSetPassword
+    verifyOtpAndSetPassword,
+    getUserProfile,
+    updateUserProfile
 }

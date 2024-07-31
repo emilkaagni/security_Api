@@ -148,6 +148,7 @@ const cors = require('cors');
 const http = require('http');
 const socketio = require('socket.io');
 const chatRoutes = require('./routes/chatRoutes');
+const socketIo = require('socket.io')
 
 const acceptFormData = require('express-fileupload');
 
@@ -158,7 +159,7 @@ const app = express();
 const server = http.createServer(app);
 
 // Initialize Socket.io server
-const io = socketio(server);
+// const io = socketio(server);
 
 // Configure Cors Policy
 const corsOptions = {
@@ -166,6 +167,11 @@ const corsOptions = {
     credentials: true,
     optionSuccessStatus: 200
 };
+
+const reviewRoutes = require('./routes/reviewRoutes');
+app.use('/api/review', reviewRoutes);
+
+
 app.use(cors(corsOptions));
 
 // Express Json Config
@@ -203,6 +209,14 @@ app.use('/api/product', require('./routes/productRoutes'));
 // chat routes
 app.use('/api/chat', chatRoutes);
 
+const io = socketio(server, {
+    cors: {
+        origin: ["http://localhost:3000"],
+        methods: ['GET', 'POST']
+    }
+});
+
+
 // Socket.io integration
 io.on('connection', (socket) => {
     console.log('New client connected');
@@ -223,7 +237,10 @@ io.on('connection', (socket) => {
             console.error('Error sending message:', error);
         }
     });
-});
+}
+
+
+);
 
 // Starting the server
 server.listen(PORT, () => {
