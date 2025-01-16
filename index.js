@@ -17,7 +17,6 @@
 // }
 // app.use(cors(corsOptions))
 
-
 // // Express Json Config
 // app.use(express.json())
 
@@ -44,7 +43,6 @@
 
 // // http://localhost:5500/test
 
-
 // // configuring Routes of User
 // app.use('/api/user', require('./routes/userRoutes'))
 
@@ -58,14 +56,10 @@
 
 // // http://localhost:5500/api/user/create
 
-
-
-
 // // Starting the server
 // const server = app.listen(PORT, () => {
 //     console.log(`Server is Running on port ${PORT}!`)
 // })
-
 
 // // Integrating chat server with the existing HTTP server
 // chatServer(server);
@@ -139,32 +133,103 @@
 //     console.log(`Server is Running on port ${PORT}!`);
 // });
 
-const express = require('express');
-const connectDatabase = require('./database/database');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const http = require('http');
-const socketHandler = require('./server/socket'); // Import socketHandler
-const chatRoutes = require('./routes/chatRoutes');
-const reviewRoutes = require('./routes/reviewRoutes');
-const acceptFormData = require('express-fileupload');
+// const express = require('express');
+// const connectDatabase = require('./database/database');
+// const dotenv = require('dotenv');
+// const cors = require('cors');
+// const http = require('http');
+// const socketHandler = require('./server/socket'); // Import socketHandler
+// const chatRoutes = require('./routes/chatRoutes');
+// const reviewRoutes = require('./routes/reviewRoutes');
+// const acceptFormData = require('express-fileupload');
+
+// dotenv.config();
+
+// // Create an express app
+// const app = express();
+
+// // Create HTTP server
+// const server = http.createServer(app);
+
+// // Initialize Socket.io
+// socketHandler(server); // Call the socketHandler function with the server
+
+// // Configure CORS policy
+// const corsOptions = {
+//     origin: true,
+//     credentials: true,
+//     optionSuccessStatus: 200,
+// };
+
+// app.use(cors(corsOptions));
+// app.use(express.json());
+// app.use(acceptFormData());
+
+// // Connect to the database
+// connectDatabase();
+
+// // Static files
+// app.use(express.static('public'));
+
+// // Define the port
+// const PORT = process.env.PORT || 5500;
+
+// // Test endpoint
+// app.get('/test', (req, res) => {
+//     res.send('Test API is Working!...');
+// });
+
+// // Configure routes
+
+// app.use('/api/user', require('./routes/userRoutes'));
+// app.use('/api/product', require('./routes/productRoutes'));
+// app.use('/api/chat', chatRoutes);
+// app.use('/api/review', reviewRoutes);
+
+// // Start the server
+// server.listen(PORT, () => {
+//     console.log(`Server is Running on port ${PORT}!`);
+// });
+
+const express = require("express");
+const connectDatabase = require("./database/database");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const http = require("http");
+const socketHandler = require("./server/socket"); // Import socketHandler
+const chatRoutes = require("./routes/chatRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
+const acceptFormData = require("express-fileupload");
+const https = require("https");
+const fs = require("fs");
 
 dotenv.config();
 
 // Create an express app
 const app = express();
 
-// Create HTTP server
-const server = http.createServer(app);
+// // Create HTTP server
+// const server = http.createServer(app);
+
+// Create HTTPS server
+const server = https.createServer(
+  // sslOptions,
+  app
+);
+//
+const sslOptions = {
+  key: fs.readFileSync("/Users/emilbasnyat/server.key"),
+  cert: fs.readFileSync("/Users/emilbasnyat/server.cert"),
+};
 
 // Initialize Socket.io
 socketHandler(server); // Call the socketHandler function with the server
 
 // Configure CORS policy
 const corsOptions = {
-    origin: true,
-    credentials: true,
-    optionSuccessStatus: 200,
+  origin: true,
+  credentials: true,
+  optionSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
@@ -175,27 +240,92 @@ app.use(acceptFormData());
 connectDatabase();
 
 // Static files
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 // Define the port
 const PORT = process.env.PORT || 5500;
 
 // Test endpoint
-app.get('/test', (req, res) => {
-    res.send('Test API is Working!...');
+app.get("/test", (req, res) => {
+  res.send("Test API is Working!...");
 });
 
 // Configure routes
 
-app.use('/api/user', require('./routes/userRoutes'));
-app.use('/api/product', require('./routes/productRoutes'));
-app.use('/api/chat', chatRoutes);
-app.use('/api/review', reviewRoutes);
+app.use("/api/user", require("./routes/userRoutes"));
+app.use("/api/product", require("./routes/productRoutes"));
+app.use("/api/chat", chatRoutes);
+app.use("/api/review", reviewRoutes);
 
 // Start the server
 server.listen(PORT, () => {
-    console.log(`Server is Running on port ${PORT}!`);
+  console.log(`Server is Running on port ${PORT}!`);
 });
+
+// const express = require('express');
+// const connectDatabase = require('./database/database');
+// const dotenv = require('dotenv');
+// const cors = require('cors');
+// const https = require('https'); // Use HTTPS module
+// const fs = require('fs');
+// const socketHandler = require('./server/socket');
+// const chatRoutes = require('./routes/chatRoutes');
+// const reviewRoutes = require('./routes/reviewRoutes');
+// const acceptFormData = require('express-fileupload');
+
+// dotenv.config();
+
+// // Load SSL/TLS certificate and key
+// const sslOptions = {
+//     key: fs.readFileSync('/Users/emil/server.key'),
+//     cert: fs.readFileSync('/Users/emil/server.cert'),
+// };
+
+// // Create an express app
+// const app = express();
+
+// // Configure CORS policy
+// const corsOptions = {
+//     origin: true,
+//     credentials: true,
+//     optionSuccessStatus: 200,
+// };
+
+// app.use(cors(corsOptions));
+// app.use(express.json());
+// app.use(acceptFormData());
+
+// // Connect to the database
+// connectDatabase();
+
+// // Static files
+// app.use(express.static('public'));
+
+// // Test endpoint
+// app.get('/test', (req, res) => {
+//     res.send('Test API is Working!...');
+// });
+
+// // Configure routes
+// app.use('/api/user', require('./routes/userRoutes'));
+// app.use('/api/product', require('./routes/productRoutes'));
+// app.use('/api/chat', chatRoutes);
+// app.use('/api/review', reviewRoutes);
+
+// // Start the HTTPS server
+// const PORT = process.env.PORT || 5500;
+// const server = https.createServer(sslOptions, app);
+
+// server.listen(PORT, () => {
+//     console.log(`Server is Running on HTTPS at https://localhost:${PORT}!`);
+// });
+
+// // Redirect HTTP to HTTPS (Optional)
+// const http = require('http');
+// http.createServer((req, res) => {
+//     res.writeHead(301, { Location: `https://${req.headers.host}${req.url}` });
+//     res.end();
+// }).listen(80);
 
 // const express = require('express');
 // const connectDatabase = require('./database/database');
@@ -226,7 +356,6 @@ server.listen(PORT, () => {
 
 // const reviewRoutes = require('./routes/reviewRoutes');
 // app.use('/api/review', reviewRoutes);
-
 
 // app.use(cors(corsOptions));
 
@@ -272,7 +401,6 @@ server.listen(PORT, () => {
 //     }
 // });
 
-
 // // Socket.io integration
 // io.on('connection', (socket) => {
 //     console.log('New client connected');
@@ -294,7 +422,6 @@ server.listen(PORT, () => {
 //         }
 //     });
 // }
-
 
 // );
 
