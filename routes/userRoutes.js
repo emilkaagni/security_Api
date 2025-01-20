@@ -37,9 +37,89 @@
 // module.exports = router
 
 
+// const router = require('express').Router();
+// const multer = require('multer');
+// const userController = require('../controllers/userControllers');
+// const { authGuard } = require('../middleware/authGuard');
+
+// const storage = multer.diskStorage({
+//     destination: (req, file, cb) => {
+//         cb(null, 'public/profile_pictures');
+//     },
+//     filename: (req, file, cb) => {
+//         cb(null, `${Date.now()}-${file.originalname}`);
+//     }
+// });
+
+// const upload = multer({ storage });
+
+// // Other routes
+// router.post('/upload_profile_picture', authGuard, upload.single('profileImage'), userController.uploadProfilePicture);
+
+
+// // Creating user registration route
+// router.post('/create', userController.createUser);
+
+// // Login route
+// router.post('/login', userController.loginUser);
+
+// // Forgot password route
+// router.post('/forgot_password', userController.forgotPassword);
+
+// // Verify OTP and set password route
+// router.post('/verify_otp', userController.verifyOtpAndSetPassword);
+
+// // Get user profile route
+// router.get('/:userId', authGuard, userController.getUserProfile);
+
+// // Update user profile route
+// router.put('/:userId', authGuard, userController.updateUserProfile);
+
+// // Upload profile
+// // router.post('/upload_profile_picture', authGuard, userController.uploadProfilePicture);
+// router.post('/upload_profile_picture', authGuard, upload.single('profilePicture'), userController.uploadProfilePicture);
+
+// module.exports = router;
+
+
+
+
+
+// const router = require('express').Router();
+// const userController = require('../controllers/userControllers');
+// const { authGuard } = require('../middleware/authGuard');
+
+// // Creating user registration route
+// router.post('/create', userController.createUser);
+
+// // Login route
+// router.post('/login', userController.loginUser);
+
+// // Forgot password route
+// router.post('/forgot_password', userController.forgotPassword);
+
+// // Verify OTP and set password route
+// router.post('/verify_otp', userController.verifyOtpAndSetPassword);
+
+// // Get user profile route
+// router.get('/:userId', authGuard, userController.getUserProfile);
+
+// // Update user profile route
+// router.put('/:userId', authGuard, userController.updateUserProfile);
+
+// // Upload profile picture route
+// router.post('/upload_profile_picture', authGuard, userController.uploadProfilePicture);
+
+// module.exports = router;
+
+
 const router = require('express').Router();
 const userController = require('../controllers/userControllers');
 const { authGuard } = require('../middleware/authGuard');
+const fileUpload = require('express-fileupload');
+
+// Middleware for handling file uploads
+router.use(fileUpload());
 
 // Creating user registration route
 router.post('/create', userController.createUser);
@@ -58,5 +138,8 @@ router.get('/:userId', authGuard, userController.getUserProfile);
 
 // Update user profile route
 router.put('/:userId', authGuard, userController.updateUserProfile);
+
+// Upload profile picture route
+router.post('/upload_profile_picture', authGuard, userController.uploadProfilePicture);
 
 module.exports = router;
